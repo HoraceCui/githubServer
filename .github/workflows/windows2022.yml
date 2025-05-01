@@ -57,12 +57,24 @@ jobs:
         echo ${{ secrets.id_gt126 }} >> C:\Users\runneradmin\.ssh\id_rsa.pub
         $file = "C:\ProgramData\ssh\sshd_config"  # 替换为你的文件路径
         cat $file
-        (Get-Content $file) `
-        -replace "^\s*#\s*PubkeyAuthentication\s+yes", "PubkeyAuthentication yes" `
-        -replace "^(?!\s*#)(\s*Match\s+Group\s+administrators)", { "#$($matches[1])" } `
-        -replace "^(?!\s*#)(\s*AuthorizedKeysFile\s+__PROGRAMDATA__/ssh/administrators_authorized_keys)", { "#$($matches[1])" } `
-        | Set-Content $file
-        Restart-Service sshd
+        $updated = @()
+
+        foreach ($line in Get-Content $file) {
+            if ($line -match '^\s*#\s*PubkeyAuthentication\s+yes') {
+                $updated += 'PubkeyAuthentication yes'
+            }
+            elseif ($line -match '^\s*(Match\s+Group\s+administrators)') {
+                $updated += "# $($matches[1])"
+            }
+            elseif ($line -match '^\s*(AuthorizedKeysFile\s+__PROGRAMDATA__/ssh/administrators_authorized_keys)') {
+                $updated += "# $($matches[1])"
+            }
+            else {
+                $updated += $line
+            }
+        }
+
+        $updated | Set-Content $file
 
     - name: code-server
       shell: pwsh # 指定在 Windows 中使用 PowerShell
