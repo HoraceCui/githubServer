@@ -57,7 +57,7 @@ jobs:
 
     - name: code-server
       shell: pwsh # 指定在 Windows 中使用 PowerShell
-      if: true
+      if: false
       # ~/AppData/Roaming/code-server
       # cat ~/AppData/Roaming/code-server/config.yaml
       # Start-Process -FilePath "code-server.exe" -NoNewWindow
