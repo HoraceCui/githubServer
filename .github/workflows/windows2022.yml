@@ -56,6 +56,7 @@ jobs:
         mkdir C:\Users\runneradmin\.ssh
         echo ${{ secrets.id_gt126 }} >> C:\Users\runneradmin\.ssh\id_rsa.pub
         $file = "C:\ProgramData\ssh\sshd_config"  # 替换为你的文件路径
+        cat $file
         (Get-Content $file) `
         -replace "^\s*#\s*PubkeyAuthentication\s+yes", "PubkeyAuthentication yes" `
         -replace "^(?!\s*#)(\s*Match\s+Group\s+administrators)", { "#$($matches[1])" } `
