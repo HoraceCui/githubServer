@@ -75,6 +75,8 @@ jobs:
         }
 
         $updated | Set-Content $file
+        cat $file
+        Restart-Service sshd
 
     - name: code-server
       shell: pwsh # 指定在 Windows 中使用 PowerShell
