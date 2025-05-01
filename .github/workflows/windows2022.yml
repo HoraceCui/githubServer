@@ -54,7 +54,7 @@ jobs:
         Write-Host "✅ 启用防火墙规则（端口 22）..."
         New-NetFirewallRule -Name sshd -DisplayName 'OpenSSH Server (sshd)' -Enabled True -Direction Inbound -Protocol TCP -Action Allow -LocalPort 22 -ErrorAction SilentlyContinue
         mkdir C:\Users\runneradmin\.ssh
-        echo ${{ secrets.id_gt126 }} >> C:\Users\runneradmin\.ssh\id_rsa.pub
+        echo ${{ secrets.id_gt126 }} >> C:\Users\runneradmin\.ssh\authorized_keys
         $file = "C:\ProgramData\ssh\sshd_config"  # 替换为你的文件路径
         cat $file
         $updated = @()
