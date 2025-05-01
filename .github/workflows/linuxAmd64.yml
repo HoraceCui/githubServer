@@ -1,4 +1,4 @@
-name: CI
+name: linuxAmd64
 
 # Controls when the workflow will run
 on:
@@ -33,7 +33,7 @@ jobs:
       - name: script 1
         run: |
           echo GITHUB_WORKSPACE
-          cd ${GITHUB_WORKSPACE}
+          cd ${GITHUB_WORKSPACE}/linuxAmd64
           pwd
           ls -al
           echo ${{ secrets.id_gt126 }} >> ./id_rsa.pub

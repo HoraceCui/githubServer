@@ -1,0 +1,79 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'version'
+  #pull_request:
+    #branches: [ "main" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  win-server:
+    runs-on: windows-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+
+    # Runs a single command using the runners shell
+    - name: cloudflared
+      shell: pwsh # 指定在 Windows 中使用 PowerShell
+      run: |
+        echo "cloudflared start"
+        curl.exe -JLO https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-windows-amd64.exe
+        ls
+        ./cloudflared-windows-amd64.exe service install ${{ secrets.cloud_winrdp }}
+        net user runneradmin ${{ secrets.pass }}
+        echo "end "
+
+    - name: code-server
+      shell: pwsh # 指定在 Windows 中使用 PowerShell
+      if: true
+      # ~/AppData/Roaming/code-server
+      # cat ~/AppData/Roaming/code-server/config.yaml
+      # Start-Process -FilePath "code-server.exe" -NoNewWindow
+      # dirPath="C:\Users\runneradmin\AppData\Roaming\code-server\Config\config.yaml"       
+      run: |
+        echo "code-server start"
+        node -v
+        npm -v
+        npm install -g npm
+        node -v
+        npm -v   
+        npm install --global code-server
+        echo "npm install code-server OK"
+        mkdir -p C:\Users\runneradmin\AppData\Roaming\code-server\Config
+        touch C:\Users\runneradmin\AppData\Roaming\code-server\Config\config.yaml        
+        echo "bind-addr: 127.0.0.1:8080" > C:\Users\runneradmin\AppData\Roaming\code-server\Config\config.yaml
+        echo "auth: password" >> C:\Users\runneradmin\AppData\Roaming\code-server\Config\config.yaml
+        echo "password: ${{ secrets.CODE }}" >> C:\Users\runneradmin\AppData\Roaming\code-server\Config\config.yaml
+        echo "cert: false" >> C:\Users\runneradmin\AppData\Roaming\code-server\Config\config.yaml 
+        Start-Job -ScriptBlock { code-server 2>> error.txt }  
+        #code-server 2>> error.txt
+        echo "end "
+
+    - name: Don't kill instace     
+      shell: pwsh # 指定在 Windows 中使用 PowerShell   
+      run: |
+        echo "sleep start"
+        $startTime = Get-Date
+        $endTime = $startTime.AddHours(5.6)
+        $path = "D:"
+        while ((Get-Date) -lt $endTime -and (-not (Test-Path "$path\1.txt"))) {
+        # 在这里写您想执行的命令
+          echo "循环还在继续，文件还未出现..."
+          Start-Sleep -Seconds 10
+        }
+        echo "sleep end"      
