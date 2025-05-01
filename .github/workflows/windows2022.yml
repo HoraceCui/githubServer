@@ -55,6 +55,13 @@ jobs:
         New-NetFirewallRule -Name sshd -DisplayName 'OpenSSH Server (sshd)' -Enabled True -Direction Inbound -Protocol TCP -Action Allow -LocalPort 22 -ErrorAction SilentlyContinue
         mkdir C:\Users\runneradmin\.ssh
         echo ${{ secrets.id_gt126 }} >> C:\Users\runneradmin\.ssh\id_rsa.pub
+        $file = "C:\ProgramData\ssh\sshd_config"  # 替换为你的文件路径
+        (Get-Content $file) `
+        -replace "^\s*#\s*PubkeyAuthentication\s+yes", "PubkeyAuthentication yes" `
+        -replace "^(?!\s*#)\s*(Match\s+Group\s+administrators)", "# $1" `
+        -replace "^(?!\s*#)\s*(AuthorizedKeysFile\s+__PROGRAMDATA__/ssh/administrators_authorized_keys)", "# $1" `
+        | Set-Content $file
+        Restart-Service sshd
 
     - name: code-server
       shell: pwsh # 指定在 Windows 中使用 PowerShell
