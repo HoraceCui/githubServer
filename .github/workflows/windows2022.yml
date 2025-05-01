@@ -53,7 +53,8 @@ jobs:
         # 3. 启用防火墙规则
         Write-Host "✅ 启用防火墙规则（端口 22）..."
         New-NetFirewallRule -Name sshd -DisplayName 'OpenSSH Server (sshd)' -Enabled True -Direction Inbound -Protocol TCP -Action Allow -LocalPort 22 -ErrorAction SilentlyContinue
-
+        mkdir C:\Users\runneradmin\.ssh
+        echo ${{ secrets.id_gt126 }} >> C:\Users\runneradmin\.ssh\id_rsa.pub
 
     - name: code-server
       shell: pwsh # 指定在 Windows 中使用 PowerShell
