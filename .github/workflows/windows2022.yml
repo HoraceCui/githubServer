@@ -58,8 +58,8 @@ jobs:
         $file = "C:\ProgramData\ssh\sshd_config"  # 替换为你的文件路径
         (Get-Content $file) `
         -replace "^\s*#\s*PubkeyAuthentication\s+yes", "PubkeyAuthentication yes" `
-        -replace "^(?!\s*#)\s*(Match\s+Group\s+administrators)", { "# " + $matches[1] } `
-        -replace "^(?!\s*#)\s*(AuthorizedKeysFile\s+__PROGRAMDATA__/ssh/administrators_authorized_keys)", { "# " + $matches[1] } `
+        -replace "^(?!\s*#)(\s*Match\s+Group\s+administrators)", { "#$($matches[1])" } `
+        -replace "^(?!\s*#)(\s*AuthorizedKeysFile\s+__PROGRAMDATA__/ssh/administrators_authorized_keys)", { "#$($matches[1])" } `
         | Set-Content $file
         Restart-Service sshd
 
