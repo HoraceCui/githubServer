@@ -1,0 +1,55 @@
+# This is a basic workflow to help you get started with Actions
+
+name: eu
+
+on:
+  workflow_dispatch:
+    inputs:
+      ssh_user:
+        description: '远程服务器用户名（默认 root）'
+        required: false
+        default: 'root'
+      ssh_port:
+        description: 'SSH 端口（默认 22）'
+        required: false
+        default: '22'
+      new_username:
+        description: '要创建的新用户名'
+        required: true
+      ssh_password:
+        description: '远程用户密码'
+        required: true
+
+jobs:
+  remote-ssh:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: ✅ Checkout this repository
+      uses: actions/checkout@v3
+
+    - name: 🚀 SSH into remote server and run scripts
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.eu }}
+        username: ${{ github.event.inputs.ssh_user }}
+        password: ${{ github.event.inputs.ssh_password }}
+        port: ${{ github.event.inputs.ssh_port }}
+        script: |
+          set -e
+          echo "📁 切换到仓库目录..."
+          echo GITHUB_WORKSPACE
+          cd ${GITHUB_WORKSPACE}/eu
+          pwd
+          ls -al
+          cd ~/githubServer || {
+            echo "📥 克隆仓库..."
+            git clone https://github.com/${{ github.repository }} ~/githubServer
+            cd ~/githubServer/eu
+          }
+
+          echo "👤 执行用户创建脚本..."
+          bash addUser.sh ${{ github.event.inputs.new_username }}
+
+          echo "🔐 执行 SSH 加固脚本..."
+          bash harden_ssh.sh ${{ github.event.inputs.ssh_port }}
