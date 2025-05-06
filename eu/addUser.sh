@@ -32,11 +32,18 @@ chmod 700 "$SSH_DIR"
 chown "$USERNAME:$USERNAME" "$SSH_DIR"
 
 # 下载公钥并写入 authorized_keys
-echo "🌐 下载公钥..."
-curl -fsSL -o "$SSH_DIR/authorized_keys" https://raw.githubusercontent.com/HoraceCui/githubServer/main/eu/id_rsa.pub
+# echo "🌐 下载公钥..."
+# curl -fsSL -o "$SSH_DIR/authorized_keys" https://raw.githubusercontent.com/HoraceCui/githubServer/main/eu/id_rsa.pub
+echo "🌐 复制公钥..."
+cp "$(dirname "$0")/id_rsa.pub" "$SSH_DIR/authorized_keys"
 
 # 设置权限
 chmod 600 "$SSH_DIR/authorized_keys"
 chown "$USERNAME:$USERNAME" "$SSH_DIR/authorized_keys"
+
+# 添加免密码 sudo 权限（Debian sudoers 结构）
+SUDOERS_FILE="/etc/sudoers.d/$USERNAME"
+echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" > "$SUDOERS_FILE"
+chmod 440 "$SUDOERS_FILE"
 
 echo "✅ 用户 $USERNAME 配置完成，已启用 SSH 免密登录"

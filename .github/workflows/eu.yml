@@ -6,11 +6,11 @@ on:
   workflow_dispatch:
     inputs:
       ssh_user:
-        description: '远程服务器用户名（默认 root）'
+        description: '远程服务器用户名（默认 root)'
         required: false
         default: 'root'
       ssh_port:
-        description: 'SSH 端口（默认 22）'
+        description: 'SSH 端口（默认 22)'
         required: false
         default: '22'
       new_username:
