@@ -23,8 +23,11 @@ jobs:
           DEST_DIR: ${GITHUB_WORKSPACE}/local    
         run: |
           sudo apt update && sudo apt install p7zip-full
-          echo GITHUB_WORKSPACE
+          echo "$GITHUB_WORKSPACE"
           cd ${GITHUB_WORKSPACE}
+          PASSWORD='gT9!xQ@7Pz#cRm4$Wv6B'
+          ARCHIVE="$GITHUB_WORKSPACE/secure.7z"
+          DEST_DIR="$GITHUB_WORKSPACE/local"
           7z x "$ARCHIVE" -p"$PASSWORD" -o"$DEST_DIR" -y
           tree
 
