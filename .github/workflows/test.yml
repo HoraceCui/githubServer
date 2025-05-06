@@ -1,0 +1,38 @@
+name: linuxAmd64
+on:
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      #- name: Set up WARP
+      #  uses: fscarmen/warp-on-actions@v1.2
+      #  with:
+      #    stack: ipv4   # Optional. Support [ ipv4, ipv6, dual ]. Default is dual.
+
+      # Runs a single command using the runners shell
+      - name: script 1
+        env:
+          PASSWORD: 'gT9!xQ@7Pz#cRm4$Wv6B'
+          ARCHIVE: ${GITHUB_WORKSPACE}/secure.7z          
+          DEST_DIR: ${GITHUB_WORKSPACE}/local    
+        run: |
+          sudo apt update && sudo apt install p7zip-full
+          echo GITHUB_WORKSPACE
+          cd ${GITHUB_WORKSPACE}
+          7z x "$ARCHIVE" -p"$PASSWORD" -o"$DEST_DIR" -y
+          tree
+
+
+
+
+
+
+
+
+
