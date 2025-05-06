@@ -1,0 +1,38 @@
+name: SSH Remote Command Execution with Manual Input Parameters
+
+on:
+  workflow_dispatch:
+    inputs:
+      host:
+        description: 'The IP address of the remote host'
+        required: true
+        default: '192.168.1.1'
+      username:
+        description: 'The SSH username'
+        required: true
+        default: 'root'
+      port:
+        description: 'The SSH port'
+        required: true
+        default: '22'
+
+jobs:
+  ssh-command:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run remote bash commands with manual input
+        uses: appleboy/ssh-action@v0.1.3
+        with:
+          host: ${{ github.event.inputs.host }}           # 从手动输入获取远程主机IP
+          username: ${{ github.event.inputs.username }}   # 从手动输入获取SSH用户名
+          key: ${{ secrets.ID_RSA_ARM }}     # 使用 GitHub Secret 存储的 SSH 私钥
+          port: ${{ github.event.inputs.port }}           # 从手动输入获取SSH端口
+          script: |
+            echo "Successfully connected!"
+            uname -a
+            df -h        
+          ssh_options: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+          
