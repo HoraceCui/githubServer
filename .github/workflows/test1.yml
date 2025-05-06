@@ -23,16 +23,35 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Run remote bash commands with manual input
-        uses: appleboy/ssh-action@v0.1.3
+      - name: Set up WARP
+        uses: fscarmen/warp-on-actions@v1.3
         with:
-          host: ${{ github.event.inputs.host }}           # 从手动输入获取远程主机IP
-          username: ${{ github.event.inputs.username }}   # 从手动输入获取SSH用户名
-          key: ${{ secrets.ID_RSA_ARM }}     # 使用 GitHub Secret 存储的 SSH 私钥
-          port: ${{ github.event.inputs.port }}           # 从手动输入获取SSH端口
-          script: |
-            echo "Successfully connected!"
+            stack: ipv6        # Optional. Support [ ipv4, ipv6, dual ]. Default is dual.
+            mode: client    # Optional. Support [ wireguard, client ]. Default is wireguard.
+
+      - name: SSH to remote IPv6 server using password
+        env:
+            HOST_IP: ${{ github.event.inputs.host }}           # 从手动输入获取远程主机IP
+            SSH_USER: ${{ github.event.inputs.username }}   # 从手动输入获取SSH用户名
+            SSH_PORT: ${{ github.event.inputs.port }}           # 从手动输入获取SSH端口
+        run: |
+            echo "🔐 Connecting to HOST..."
+            mkdir -p ~/.ssh
+            echo "${{ secrets.ID_RSA_ARM }}" > ~/.ssh/id_rsa
+            chmod 600 ~/.ssh/id_rsa
+
+
+            cd ${GITHUB_WORKSPACE}/eu
+            cp config_initrsa config_new
+            sed -i "s/^[[:space:]]*HostName .*/    HostName $HOST_IP/" config_new
+            sed -i "s/^[[:space:]]*Port .*/    Port $SSH_PORT/" config_new
+            sed -i "s/^[[:space:]]*User .*/    User $SSH_USER/" config_new
+            ls -al
+            cat config_new
+            ssh -F config_new myServer bash <<EOF
+            set -e
             uname -a
-            df -h        
-          ssh_options: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
-          
+            df -h
+            EOF
+            echo "🔐 Connecting to HOST END..."
+
