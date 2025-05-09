@@ -44,6 +44,7 @@ jobs:
           ./buildSsh.sh
           ./cloudflare.sh
           ./code-server.sh
+          ip -o -f inet addr show eth0 | awk '{print $4}'
           ./end.sh
 
 
