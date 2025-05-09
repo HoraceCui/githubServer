@@ -32,7 +32,7 @@ jobs:
       # Runs a single command using the runners shell
       - name: script 1
         run: |
-          echo GITHUB_WORKSPACE
+          echo ${GITHUB_WORKSPACE}
           cd ${GITHUB_WORKSPACE}/linuxAmd64
           pwd
           ls -al
@@ -44,8 +44,34 @@ jobs:
           ./buildSsh.sh
           ./cloudflare.sh
           ./code-server.sh
+          
+
+      - name: Get IP Address
+        id: get_ip
+        run: |
           ip -o -f inet addr show eth0 | awk '{print $4}'
+          ip=$(ip -o -f inet addr show eth0 | awk '{print $4}' | cut -d'/' -f1)
+          echo "IP: $ip"
+          echo "ip_address=$ip" >> $GITHUB_OUTPUT
+
+      - name: Send IP via curl
+        env:
+          UPSTASH_URL: ${{ secrets.UPSTASH_URL }}
+          UPSTASH_TOKEN: ${{ secrets.UPSTASH_TOKEN }}
+        run: |
+          ip="${{ steps.get_ip.outputs.ip_address }}"
+          echo "Sending IP: $ip"
+          curl "${UPSTASH_URL}/set/github_action_ip/$ip" \
+            -H "Authorization: Bearer ${UPSTASH_TOKEN}"
+
+      - name: end 
+        run: |
+          echo ${GITHUB_WORKSPACE}
+          cd ${GITHUB_WORKSPACE}/linuxAmd64
           ./end.sh
+
+      
+
 
 
 
