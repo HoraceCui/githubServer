@@ -1,12 +1,7 @@
-name: linuxAmd64_1
+name: linuxAmd64_ipv6
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
-  push:
-    branches: [ "main" ]
-    paths:
-      - 'version'
   workflow_dispatch:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -24,7 +19,7 @@ jobs:
       - name: Set up WARP
         uses: fscarmen/warp-on-actions@v1.3
         with:
-          stack: dual        # Optional. Support [ ipv4, ipv6, dual ]. Default is dual.
+          stack: ipv6        # Optional. Support [ ipv4, ipv6, dual ]. Default is dual.
           mode: client    # Optional. Support [ wireguard, client ]. Default is wireguard.
       
       - name: script 1
