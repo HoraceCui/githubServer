@@ -4,6 +4,12 @@ name: linuxAmd64_ipv6
 on:
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }} #以 workflow 名称作为唯一分组键，相同 workflow 名称的实例将归为一组。
+  cancel-in-progress: false 
+  # false 表示不取消正在运行的 workflow，而是等待前一个执行完成。
+  # true 自动取消前一个运行的实例（而不是等待它完成）
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
@@ -29,9 +35,9 @@ jobs:
           pwd
           ls -al
           echo ${{ secrets.id_gt126 }} >> ./id_rsa.pub
-          #echo ${{ secrets.cloud_github_2 }} >> ./id_rsa1.pub
+          #echo ${{ secrets.cloud_github_3 }} >> ./id_rsa1.pub
           #echo ${{ secrets.code }} >> ./id_rsa1.pub
-          sed -i -r "s/cloudSecret/${{ secrets.cloud_github_2 }}/g" ./cloudflare.sh
+          sed -i -r "s/cloudSecret/${{ secrets.cloud_github_3 }}/g" ./cloudflare.sh
           sed -i -r "s/codeSecret/${{ secrets.code }}/g" ./config.yaml
           ./buildSsh.sh
           ./cloudflare.sh
