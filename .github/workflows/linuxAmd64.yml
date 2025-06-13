@@ -13,6 +13,12 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }} #以 workflow 名称作为唯一分组键，相同 workflow 名称的实例将归为一组。
+  cancel-in-progress: false 
+  # false 表示不取消正在运行的 workflow，而是等待前一个执行完成。
+  # true 自动取消前一个运行的实例（而不是等待它完成）
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
@@ -32,7 +38,7 @@ jobs:
       # Runs a single command using the runners shell
       - name: script 1
         run: |
-          echo GITHUB_WORKSPACE
+          echo ${GITHUB_WORKSPACE}
           cd ${GITHUB_WORKSPACE}/linuxAmd64
           pwd
           ls -al
@@ -44,7 +50,34 @@ jobs:
           ./buildSsh.sh
           ./cloudflare.sh
           ./code-server.sh
+          
+
+      - name: Get IP Address
+        id: get_ip
+        run: |
+          ip -o -f inet addr show eth0 | awk '{print $4}'
+          ip=$(ip -o -f inet addr show eth0 | awk '{print $4}' | cut -d'/' -f1)
+          echo "IP: $ip"
+          echo "ip_address=$ip" >> $GITHUB_OUTPUT
+
+      - name: Send IP via curl
+        env:
+          UPSTASH_URL: ${{ secrets.UPSTASH_URL }}
+          UPSTASH_TOKEN: ${{ secrets.UPSTASH_TOKEN }}
+        run: |
+          ip="${{ steps.get_ip.outputs.ip_address }}"
+          echo "Sending IP: $ip"
+          curl "${UPSTASH_URL}/set/github_action_ip/$ip" \
+            -H "Authorization: Bearer ${UPSTASH_TOKEN}"
+
+      - name: end 
+        run: |
+          echo ${GITHUB_WORKSPACE}
+          cd ${GITHUB_WORKSPACE}/linuxAmd64
           ./end.sh
+
+      
+
 
 
 
