@@ -71,6 +71,7 @@ jobs:
           cd ${GITHUB_WORKSPACE}/eu
           sshpass -p "$SSH_PASS" ssh -F config_new myServer bash <<EOF
             set -e
+            apt update && apt upgrade -y
             apt update && apt install -y sudo curl 
             cd /tmp
             tar xf scripts.tar.gz
