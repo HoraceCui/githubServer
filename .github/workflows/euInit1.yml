@@ -49,6 +49,6 @@ jobs:
           cat config_new
           echo "📤 使用 ssh 执行 "myServer" 'sudo apt update && sudo apt upgrade -y && sudo reboot'.."
           #sshpass -p "$SSH_PASS" scp -F config_new scripts.tar.gz "myServer:/tmp/"
-          sshpass -p "$SSH_PASS" ssh -F config_new "myServer" 'apt update && apt install sudo curl -y && sudo apt upgrade -y && sudo reboot'
+          sshpass -p "$SSH_PASS" ssh -F config_new "myServer" 'apt update && apt install sudo zip unzip curl gpg lsb-release -y && sudo apt upgrade -y && sudo reboot'
           echo "📤 成功..."
 
